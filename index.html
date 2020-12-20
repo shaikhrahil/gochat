@@ -2,12 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=dmsgice-width, initial-scale=1.0" />
     <title>Document</title>
-    <button onclick="sendMessage()">Send message</button>
     <button onclick="disconnect()">Close Connection</button>
+
+    <section>
+      <form id="messageForm">
+        <input type="text" id="messageInput" required/>
+      </form>
+    </section>
+
+    <section id="messagesSection">
+      <h3>Messages :</h3>
+    </section>
+
     <script defer>
       const ws = new WebSocket("ws://localhost:3000/ws/rahil");
+      const wsDom = document.getElementById("messagesSection");
+      const createWsDomChild = (msg) => {
+        const el = document.createElement("p");
+        const hLine = document.createElement("hr");
+        el.innerText = msg;
+        wsDom.appendChild(el);
+        wsDom.appendChild(hLine);
+      };
       const Channel = "rahil";
       const disconnect = () => {
         ws.send({
@@ -17,35 +35,41 @@
         });
         ws.close();
       };
-      const sendMessage = () => {
+
+      
+
+      const sendMessage = (evt) => {
+        evt.preventDefault();
         ws.send(
           JSON.stringify({
             command: 2,
             Channel,
-            Message: "hello !!",
+            Message: document.getElementById('messageInput').value,
           })
         );
+      };
+      document.getElementById('messageForm').addEventListener('submit' ,sendMessage)
+
+      ws.onerror = (msg) => {
+        console.log("Error : ", msg);
+        createWsDomChild("Error : " + JSON.stringify(msg.data, null, 2));
       };
 
       ws.onmessage = (msg) => {
         console.log("Message : ", msg);
+        createWsDomChild("Message : " + JSON.stringify(msg.data, null, 2));
       };
 
-      ws.onopen = (ev) => {
-        console.log("Opened : ", ev);
-        // ws.send(
-        //   JSON.stringify({
-        //     command: 0,
-        //     Channel,
-        //     Message: "content text",
-        //   })
-        // );
+      ws.onopen = (msg) => {
+        console.log("Opened : ", msg);
+        createWsDomChild("Opened : " + JSON.stringify(msg.data, null, 2));
       };
 
-      ws.onclose = (ev) => {
-        console.log("Closed : ", ev);
+      ws.onclose = (msg) => {
+        console.log("Closed : ", msg);
+        createWsDomChild("Closed : " + JSON.stringify(msg.data, null, 2));
       };
     </script>
-  </head>
+  </msg.data>
   <body></body>
 </html>

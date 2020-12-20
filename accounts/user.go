@@ -20,9 +20,11 @@ func (u *User) Disconnect(rdb *redis.Client) error {
 	if err != nil {
 		return err
 	}
+	log.Println("Unsubscribed " + u.Id + " from redis")
 	if userExists := rdb.Exists(u.Id); userExists != nil {
 		rdb.Del(u.Id)
 	}
+	log.Println("Removed " + u.Id + " from redis")
 	return nil
 }
 
