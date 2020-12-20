@@ -27,6 +27,7 @@ func main() {
 		log.Fatal("Failed to connect to redis due to following error : \n", connected.Err())
 	}
 
+	log.Println("Starting server ..")
 	app := fiber.New()
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World 👋!")
