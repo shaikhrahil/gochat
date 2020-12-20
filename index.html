@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <button onclick="sendMessage()">Send message</button>
+    <button onclick="disconnect()">Close Connection</button>
+    <script defer>
+      const ws = new WebSocket("ws://localhost:3000/ws/rahil");
+      const Channel = "rahil";
+      const disconnect = () => {
+        ws.send({
+          command: 1,
+          Channel,
+          Message: "",
+        });
+        ws.close();
+      };
+      const sendMessage = () => {
+        ws.send(
+          JSON.stringify({
+            command: 2,
+            Channel,
+            Message: "hello !!",
+          })
+        );
+      };
+
+      ws.onmessage = (msg) => {
+        console.log("Message : ", msg);
+      };
+
+      ws.onopen = (ev) => {
+        console.log("Opened : ", ev);
+        // ws.send(
+        //   JSON.stringify({
+        //     command: 0,
+        //     Channel,
+        //     Message: "content text",
+        //   })
+        // );
+      };
+
+      ws.onclose = (ev) => {
+        console.log("Closed : ", ev);
+      };
+    </script>
+  </head>
+  <body></body>
+</html>
