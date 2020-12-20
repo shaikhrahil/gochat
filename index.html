@@ -2,74 +2,87 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=dmsgice-width, initial-scale=1.0" />
-    <title>Document</title>
-    <button onclick="disconnect()">Close Connection</button>
+    <title>Chat app</title>
+  </head>
 
+  <body>
     <section>
       <form id="messageForm">
-        <input type="text" id="messageInput" required/>
+        <input
+          type="text"
+          id="messageRecipient"
+          placeholder="To"
+          name="to"
+          value="rahil"
+          required
+        />
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Message"
+          name="msg"
+          required
+        />
+        <input type="submit" value="Send" />
+        <!-- <button type="submit">Send</button> -->
       </form>
     </section>
 
     <section id="messagesSection">
       <h3>Messages :</h3>
     </section>
+  </body>
 
-    <script defer>
-      const ws = new WebSocket("ws://localhost:3000/ws/rahil");
-      const wsDom = document.getElementById("messagesSection");
-      const createWsDomChild = (msg) => {
-        const el = document.createElement("p");
-        const hLine = document.createElement("hr");
-        el.innerText = msg;
-        wsDom.appendChild(el);
-        wsDom.appendChild(hLine);
-      };
-      const Channel = "rahil";
-      const disconnect = () => {
-        ws.send({
-          command: 1,
-          Channel,
-          Message: "",
-        });
-        ws.close();
-      };
+  <script>
+    const ws = new WebSocket("ws://localhost:3000/ws/rahil");
+    const wsDom = document.getElementById("messagesSection");
+    const createWsDomChild = (msg) => {
+      const el = document.createElement("p");
+      const hLine = document.createElement("hr");
+      el.innerText = msg;
+      wsDom.prepend(el);
+      wsDom.prepend(hLine);
+    };
+    const disconnect = () => {
+      ws.send({
+        Command: 1,
+        Channel: document.getElementById("messageRecipient").value,
+        Message: "",
+      });
+      ws.close();
+    };
 
-      
-
-      const sendMessage = (evt) => {
+    document
+      .getElementById("messageForm")
+      .addEventListener("submit", function (evt) {
         evt.preventDefault();
         ws.send(
           JSON.stringify({
-            command: 2,
-            Channel,
-            Message: document.getElementById('messageInput').value,
+            Command: 2,
+            Channel: document.getElementById("messageRecipient").value,
+            Message: document.getElementById("messageInput").value,
           })
         );
-      };
-      document.getElementById('messageForm').addEventListener('submit' ,sendMessage)
+      });
 
-      ws.onerror = (msg) => {
-        console.log("Error : ", msg);
-        createWsDomChild("Error : " + JSON.stringify(msg.data, null, 2));
-      };
+    ws.onerror = (msg) => {
+      console.log("Error : ", msg);
+      createWsDomChild("Error : " + JSON.stringify(msg.data, null, 2));
+    };
 
-      ws.onmessage = (msg) => {
-        console.log("Message : ", msg);
-        createWsDomChild("Message : " + JSON.stringify(msg.data, null, 2));
-      };
+    ws.onmessage = (msg) => {
+      console.log("Message : ", msg);
+      createWsDomChild("Message : " + JSON.stringify(msg.data, null, 2));
+    };
 
-      ws.onopen = (msg) => {
-        console.log("Opened : ", msg);
-        createWsDomChild("Opened : " + JSON.stringify(msg.data, null, 2));
-      };
+    ws.onopen = (msg) => {
+      console.log("Opened : ", msg);
+      createWsDomChild("Opened : " + JSON.stringify(msg.data, null, 2));
+    };
 
-      ws.onclose = (msg) => {
-        console.log("Closed : ", msg);
-        createWsDomChild("Closed : " + JSON.stringify(msg.data, null, 2));
-      };
-    </script>
-  </msg.data>
-  <body></body>
+    ws.onclose = (msg) => {
+      console.log("Closed : ", msg);
+      createWsDomChild("Closed : " + JSON.stringify(msg.data, null, 2));
+    };
+  </script>
 </html>

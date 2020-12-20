@@ -28,9 +28,9 @@ func (u *User) Disconnect(rdb *redis.Client) error {
 	return nil
 }
 
-func (u *User) Connect(rdb *redis.Client, channels string) error {
+func (u *User) Connect(rdb *redis.Client, channels []string) error {
 	log.Println("Subscribed to ", channels)
-	pubSub := rdb.Subscribe(channels)
+	pubSub := rdb.Subscribe(channels...)
 	u.ChannelHandler = pubSub
 
 	go func() {

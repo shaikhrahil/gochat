@@ -28,7 +28,7 @@ func Register(rdb *redis.Client) func(*fiber.Ctx) error {
 			MessageChan:    make(chan redis.Message),
 		}
 
-		user.Connect(rdb, userID)
+		user.Connect(rdb, []string{userID})
 
 		conn.SetCloseHandler(func(code int, text string) error {
 			err := user.Disconnect(rdb)
@@ -38,8 +38,8 @@ func Register(rdb *redis.Client) func(*fiber.Ctx) error {
 			return nil
 		})
 
-		go messaging.HandleInbound(*user, conn)
-		messaging.HandleOutbound(conn, rdb)
+		go messaging.HandleOutbound(*user, conn)
+		messaging.HandleInbound(conn, rdb)
 
 	})
 

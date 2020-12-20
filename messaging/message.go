@@ -6,3 +6,7 @@ type Message struct {
 	Channel string
 	Message string
 }
+
+type SubscriptionMessage struct {
+	Channels []string
+}

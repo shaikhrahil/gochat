@@ -14,8 +14,8 @@ const (
 	messageCode
 )
 
-// HandleInbound handles incoming messages
-func HandleInbound(user accounts.User, conn *websocket.Conn) error {
+// HandleOutbound handles outgoing messages from server
+func HandleOutbound(user accounts.User, conn *websocket.Conn) error {
 	for m := range user.MessageChan {
 		if err := conn.WriteJSON(m.Payload); err != nil {
 			log.Println("Some error occured while writing to socket", err)
@@ -24,8 +24,8 @@ func HandleInbound(user accounts.User, conn *websocket.Conn) error {
 	return nil
 }
 
-// HandleOutbound handles outgoing messages
-func HandleOutbound(conn *websocket.Conn, rdb *redis.Client) {
+// HandleInbound handles incoming messages to the server
+func HandleInbound(conn *websocket.Conn, rdb *redis.Client) {
 
 	var (
 		mt  int
@@ -40,16 +40,15 @@ func HandleOutbound(conn *websocket.Conn, rdb *redis.Client) {
 	if err == nil {
 		for {
 			var parsedMsg Message
-
 			if err := conn.ReadJSON(&parsedMsg); err != nil {
-				log.Println("Connection failed !")
-				return
+				log.Println("Invalid message", err)
+				if err := conn.WriteJSON("{test : 'sddslk'}"); err != nil {
+					log.Println("Error while error ! : ", err)
+				}
 			}
 
-			err := rdb.Publish(parsedMsg.Channel, parsedMsg.Message)
-			if someErr := err.Err(); someErr != nil {
-				log.Println("Message publish tot redis failed !", parsedMsg)
-				conn.WriteJSON(someErr.Error())
+			if err := rdb.Publish(parsedMsg.Channel, parsedMsg.Message).Err(); err != nil {
+				log.Println("Message publish tot redis failed !", err.Error())
 			}
 		}
 	}
