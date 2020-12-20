@@ -39,7 +39,7 @@ func Register(rdb *redis.Client) func(*fiber.Ctx) error {
 		})
 
 		go messaging.HandleOutbound(*user, conn)
-		messaging.HandleInbound(conn, rdb)
+		messaging.HandleInbound(conn, rdb, user.DisconnectChan)
 
 	})
 

@@ -24,6 +24,7 @@ func (u *User) Disconnect(rdb *redis.Client) error {
 	if userExists := rdb.Exists(u.Id); userExists != nil {
 		rdb.Del(u.Id)
 	}
+	close(u.DisconnectChan)
 	log.Println("Removed " + u.Id + " from redis")
 	return nil
 }

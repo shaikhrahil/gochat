@@ -25,30 +25,28 @@ func HandleOutbound(user accounts.User, conn *websocket.Conn) error {
 }
 
 // HandleInbound handles incoming messages to the server
-func HandleInbound(conn *websocket.Conn, rdb *redis.Client) {
-
-	var (
-		mt  int
-		msg []byte
-		err error
-	)
-
-	mt, msg, err = conn.ReadMessage()
-	if err != nil {
-		log.Println(mt, msg, err)
-	}
-	if err == nil {
-		for {
-			var parsedMsg Message
-			if err := conn.ReadJSON(&parsedMsg); err != nil {
-				log.Println("Invalid message", err)
-				if err := conn.WriteJSON("{test : 'sddslk'}"); err != nil {
-					log.Println("Error while error ! : ", err)
+func HandleInbound(conn *websocket.Conn, rdb *redis.Client, closeCh chan struct{}) {
+loop:
+	for {
+		select {
+		case <-closeCh:
+			break loop
+		default:
+			{
+				var parsedMsg Message
+				err := conn.ReadJSON(&parsedMsg)
+				if err != nil {
+					log.Println("Invalid message", err)
+					if err := conn.WriteJSON("{test : 'sddslk'}"); err != nil {
+						log.Println("Error while error ! : ", err)
+					}
 				}
-			}
 
-			if err := rdb.Publish(parsedMsg.Channel, parsedMsg.Message).Err(); err != nil {
-				log.Println("Message publish tot redis failed !", err.Error())
+				if err == nil {
+					if err := rdb.Publish(parsedMsg.Channel, parsedMsg.Message).Err(); err != nil {
+						log.Println("Message publish to redis failed !", err.Error())
+					}
+				}
 			}
 		}
 	}
