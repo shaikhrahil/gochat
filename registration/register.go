@@ -3,6 +3,7 @@ package registration
 import (
 	"chatterbox/accounts"
 	"chatterbox/messaging"
+	"strings"
 
 	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
@@ -19,7 +20,6 @@ func Register(rdb *redis.Client) func(*fiber.Ctx) error {
 		// log.Println(c.Cookies("session")) // ""
 
 		userID := conn.Params("id")
-		// channels := c.Query("c")
 
 		user := &accounts.User{
 			Id:             userID,
@@ -28,7 +28,7 @@ func Register(rdb *redis.Client) func(*fiber.Ctx) error {
 			MessageChan:    make(chan redis.Message),
 		}
 
-		user.Connect(rdb, []string{userID})
+		user.Connect(rdb, strings.Split(userID, ","))
 
 		conn.SetCloseHandler(func(code int, text string) error {
 			err := user.Disconnect(rdb)

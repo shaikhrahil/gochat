@@ -9,9 +9,8 @@ import (
 )
 
 const (
-	connectCode = iota
-	disconnectCode
-	messageCode
+	codeAck = iota
+	codeMsg
 )
 
 // HandleOutbound handles outgoing messages from server
@@ -43,6 +42,9 @@ loop:
 				}
 
 				if err == nil {
+					if err := rdb.LPush(parsedMsg.Channel, parsedMsg.Message).Err(); err != nil {
+						log.Println("Message publish to redis failed !", err.Error())
+					}
 					if err := rdb.Publish(parsedMsg.Channel, parsedMsg.Message).Err(); err != nil {
 						log.Println("Message publish to redis failed !", err.Error())
 					}

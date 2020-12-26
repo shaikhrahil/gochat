@@ -32,6 +32,14 @@ func (u *User) Disconnect(rdb *redis.Client) error {
 func (u *User) Connect(rdb *redis.Client, channels []string) error {
 	log.Println("Subscribed to ", channels)
 	pubSub := rdb.Subscribe(channels...)
+	for _, ch := range channels {
+		test := rdb.LRange(ch, 0, -1)
+		if test.Err() == nil {
+			for _, msg := range test.Val() {
+				rdb.Publish(ch, msg)
+			}
+		}
+	}
 	u.ChannelHandler = pubSub
 
 	go func() {
@@ -44,6 +52,7 @@ func (u *User) Connect(rdb *redis.Client, channels []string) error {
 					return
 				}
 				log.Println("Sent message to ", channels)
+				rdb.LPush(msg.Channel, msg.Payload)
 				u.MessageChan <- *msg
 			case <-u.DisconnectChan:
 				log.Println("Disconnected channel triggered fro ", channels)
