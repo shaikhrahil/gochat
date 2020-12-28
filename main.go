@@ -1,7 +1,7 @@
 package main
 
 import (
-	"chatterbox/registration"
+	"chatterbox/accounts"
 	"log"
 	"os"
 
@@ -33,7 +33,7 @@ func main() {
 		return c.SendString("Hello, World 👋!")
 	})
 
-	app.Get("/ws/:id", registration.Register(redisDB))
+	app.Get("/ws/:id", accounts.Register(redisDB))
 
 	app.Listen(":3000")
 }

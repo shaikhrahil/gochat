@@ -1,7 +1,6 @@
-package registration
+package accounts
 
 import (
-	"chatterbox/accounts"
 	"chatterbox/messaging"
 	"strings"
 
@@ -21,7 +20,7 @@ func Register(rdb *redis.Client) func(*fiber.Ctx) error {
 
 		userID := conn.Params("id")
 
-		user := &accounts.User{
+		user := &User{
 			Id:             userID,
 			Name:           userID,
 			DisconnectChan: make(chan struct{}),
@@ -38,9 +37,8 @@ func Register(rdb *redis.Client) func(*fiber.Ctx) error {
 			return nil
 		})
 
-		go messaging.HandleOutbound(*user, conn)
+		go messaging.HandleOutbound(user.MessageChan, conn)
 		messaging.HandleInbound(conn, rdb, user.DisconnectChan)
 
 	})
-
 }
