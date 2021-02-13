@@ -1,0 +1,6 @@
+{
+  "ImportPath": "chatterbox",
+  "GoVersion": "go1.15.5",
+  "Packages": ["./…"],
+  "Deps": []
+}
