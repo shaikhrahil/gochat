@@ -1,6 +1,6 @@
 module chatterbox
 
-// +heroku goVersion go1.11
+// +heroku goVersion go1.15
 go 1.15
 
 require (
