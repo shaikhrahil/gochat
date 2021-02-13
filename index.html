@@ -36,7 +36,7 @@
   <script>
     const params = new URLSearchParams(location.href.split("?")[1]);
     const ws = new WebSocket(
-      `ws://localhost:3000/ws/${params?.get("u") || "rahil"}`
+      `ws://polar-sierra-52643.herokuapp.com/ws/${params?.get("u") || "rahil"}`
     );
     const wsDom = document.getElementById("messagesSection");
     const createWsDomChild = (msg) => {
