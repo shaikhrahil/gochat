@@ -13,10 +13,11 @@ func main() {
 
 	redisURL := os.Getenv("REDIS_URL")
 	if redisURL == "" {
-		redisURL = "192.168.43.166:6379"
+		redisURL = "redis-13055.c244.us-east-1-2.ec2.cloud.redislabs.com:13055"
 	}
 	redisDB := redis.NewClient(&redis.Options{
-		Addr: redisURL,
+		Addr:     redisURL,
+		Password: "qHPPABRBDxqKS7JoF46scyM7pSKBiNbG",
 	})
 
 	log.Println("Connecting to redis at ", redisURL)
