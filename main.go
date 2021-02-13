@@ -36,5 +36,10 @@ func main() {
 
 	app.Get("/ws/:id", accounts.Register(redisDB))
 
-	app.Listen(":3000")
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "3000"
+	}
+	app.Listen(":" + port)
 }
