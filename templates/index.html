@@ -35,7 +35,10 @@
   <script>
     const params = new URLSearchParams(location.href.split("?")[1]);
     const socket =
-      "ws://" + document.location.host + "/ws/" + (params?.get("u") || "rahil");
+      "wss://" +
+      document.location.host +
+      "/ws/" +
+      (params?.get("u") || "rahil");
     const ws = new WebSocket(socket);
     const wsDom = document.getElementById("messagesSection");
     const createWsDomChild = (msg) => {
