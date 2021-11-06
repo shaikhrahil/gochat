@@ -50,12 +50,14 @@ func main() {
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
+	app.Get("/ws/:id", registration.Register(redisDB))
 	// app.Static("/", "static/public")
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Render("index", fiber.Map{})
+	})
 	app.Get("/chat", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{})
 	})
 
-	app.Get("/ws/:id", registration.Register(redisDB))
-
-	app.Listen(":3000")
+	app.Listen(":443")
 }

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chatterbox</title>
+  </head>
+
+  <body>
+    <section>
+      <form id="messageForm">
+        <input
+          type="text"
+          id="messageRecipient"
+          placeholder="To"
+          name="to"
+          value="rahil"
+          required
+        />
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Message"
+          name="msg"
+          required
+        />
+        <input type="submit" value="Send" />
+      </form>
+    </section>
+
+    <section id="messagesSection">
+      <h3>Messages :</h3>
+    </section>
+  </body>
+
+  <script>
+    const params = new URLSearchParams(location.href.split("?")[1]);
+    const socket =
+      "ws://" + document.location.host + "/ws/" + (params?.get("u") || "rahil");
+    const ws = new WebSocket(socket);
+    const wsDom = document.getElementById("messagesSection");
+    const createWsDomChild = (msg) => {
+      const el = document.createElement("p");
+      const hLine = document.createElement("hr");
+      el.innerText = msg;
+      wsDom.prepend(el);
+      wsDom.prepend(hLine);
+    };
+    const disconnect = () => {
+      ws.send({
+        Command: 1,
+        Channel: document.getElementById("messageRecipient").value,
+        Message: "",
+      });
+      ws.close();
+    };
+
+    document
+      .getElementById("messageForm")
+      .addEventListener("submit", function (evt) {
+        evt.preventDefault();
+        ws.send(
+          JSON.stringify({
+            Command: 2,
+            Channel: document.getElementById("messageRecipient").value,
+            Message: document.getElementById("messageInput").value,
+          })
+        );
+      });
+
+    ws.onerror = (msg) => {
+      console.log("Error : ", msg);
+      createWsDomChild("Connection Errored");
+    };
+
+    ws.onmessage = (msg) => {
+      console.log("Message : ", msg);
+      createWsDomChild("Message : " + JSON.stringify(msg.data, null, 2));
+    };
+
+    ws.onopen = (msg) => {
+      console.log("Opened : ", msg);
+      createWsDomChild("Connected");
+    };
+
+    ws.onclose = (msg) => {
+      console.log("Closed : ", msg);
+      createWsDomChild("Connection Closed");
+    };
+  </script>
+</html>
