@@ -2,6 +2,7 @@ package main
 
 import (
 	"chatterbox/registration"
+	"fmt"
 	"log"
 	"os"
 
@@ -59,5 +60,11 @@ func main() {
 		return c.Render("index", fiber.Map{})
 	})
 
-	app.Listen(":3000")
+	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
+
+	if port == "" {
+		port = fmt.Sprintf(":%d", 3000)
+	}
+
+	app.Listen(port)
 }
