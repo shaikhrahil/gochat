@@ -3,6 +3,7 @@ package main
 import (
 	"chatterbox/registration"
 	"log"
+	"os"
 
 	"github.com/gofiber/template/html"
 	"github.com/tkanos/gonfig"
@@ -21,6 +22,14 @@ func main() {
 	if err := gonfig.GetConf("env.json", &configuration); err != nil {
 		// log.Fatalln(err.Error())
 		log.Println("env.json not found")
+	}
+
+	if configuration.REDIS_URL == "" {
+		configuration.REDIS_URL = os.Getenv("REDIS_URL")
+	}
+
+	if configuration.REDIS_PWD == "" {
+		configuration.REDIS_PWD = os.Getenv("REDIS_PWD")
 	}
 
 	redisDB := redis.NewClient(&redis.Options{
