@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Chat app</title>
+    <title>Chatterbox</title>
   </head>
 
   <body>
@@ -24,7 +24,6 @@
           required
         />
         <input type="submit" value="Send" />
-        <!-- <button type="submit">Send</button> -->
       </form>
     </section>
 
@@ -35,9 +34,9 @@
 
   <script>
     const params = new URLSearchParams(location.href.split("?")[1]);
-    const ws = new WebSocket(
-      `ws://localhost:3000/ws/${params?.get("u") || "rahil"}`
-    );
+    const socket =
+      "ws://" + document.location.host + "/ws/" + (params?.get("u") || "rahil");
+    const ws = new WebSocket(socket);
     const wsDom = document.getElementById("messagesSection");
     const createWsDomChild = (msg) => {
       const el = document.createElement("p");
@@ -70,7 +69,7 @@
 
     ws.onerror = (msg) => {
       console.log("Error : ", msg);
-      createWsDomChild("Error : " + JSON.stringify(msg.data, null, 2));
+      createWsDomChild("Connection Errored");
     };
 
     ws.onmessage = (msg) => {
@@ -80,12 +79,12 @@
 
     ws.onopen = (msg) => {
       console.log("Opened : ", msg);
-      createWsDomChild("Opened : " + JSON.stringify(msg.data, null, 2));
+      createWsDomChild("Connected");
     };
 
     ws.onclose = (msg) => {
       console.log("Closed : ", msg);
-      createWsDomChild("Closed : " + JSON.stringify(msg.data, null, 2));
+      createWsDomChild("Connection Closed");
     };
   </script>
 </html>
