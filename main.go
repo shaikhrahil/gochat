@@ -1,8 +1,7 @@
 package main
 
 import (
-	"chatterbox/registration"
-	"fmt"
+	"chatterbox/accounts"
 	"log"
 	"os"
 
@@ -60,11 +59,12 @@ func main() {
 		return c.Render("index", fiber.Map{})
 	})
 
-	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
+	app.Get("/ws/:id", accounts.Register(redisDB))
+
+	port := os.Getenv("PORT")
 
 	if port == "" {
-		port = fmt.Sprintf(":%d", 3000)
+		port = "3000"
 	}
-
-	app.Listen(port)
+	app.Listen(":" + port)
 }

@@ -1,21 +1,15 @@
 package messaging
 
 import (
-	"chatterbox/accounts"
 	"log"
 
 	"github.com/go-redis/redis"
 	"github.com/gofiber/websocket/v2"
 )
 
-const (
-	codeAck = iota
-	codeMsg
-)
-
 // HandleOutbound handles outgoing messages from server
-func HandleOutbound(user accounts.User, conn *websocket.Conn) error {
-	for m := range user.MessageChan {
+func HandleOutbound(msgChan chan redis.Message, conn *websocket.Conn) error {
+	for m := range msgChan {
 		if err := conn.WriteJSON(m.Payload); err != nil {
 			log.Println("Some error occured while writing to socket", err)
 		}
