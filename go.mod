@@ -1,12 +1,9 @@
 module chatterbox
 
+// +heroku goVersion go1.15
 go 1.15
 
 require (
-	github.com/andybalholm/brotli v1.0.1 // indirect
-	github.com/klauspost/compress v1.11.3 // indirect
-	golang.org/x/sys v0.0.0-20201218084310-7d0127a74742 // indirect
-
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/gofiber/fiber/v2 v2.20.1
 	github.com/gofiber/template v1.6.18
