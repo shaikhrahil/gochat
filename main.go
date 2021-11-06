@@ -3,24 +3,32 @@ package main
 import (
 	"chatterbox/accounts"
 	"log"
-	"os"
+
+	"github.com/gofiber/template/html"
+	"github.com/tkanos/gonfig"
 
 	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
 )
 
-func main() {
+type Configuration struct {
+	REDIS_URL string
+	REDIS_PWD string
+}
 
-	redisURL := os.Getenv("REDIS_URL")
-	if redisURL == "" {
-		redisURL = "redis-13055.c244.us-east-1-2.ec2.cloud.redislabs.com:13055"
+func main() {
+	configuration := Configuration{}
+	if err := gonfig.GetConf("env.json", &configuration); err != nil {
+		// log.Fatalln(err.Error())
+		log.Println("env.json not found")
 	}
+
 	redisDB := redis.NewClient(&redis.Options{
-		Addr:     redisURL,
-		Password: "qHPPABRBDxqKS7JoF46scyM7pSKBiNbG",
+		Addr:     configuration.REDIS_URL,
+		Password: configuration.REDIS_PWD,
 	})
 
-	log.Println("Connecting to redis at ", redisURL)
+	log.Println("Connecting to redis ..")
 
 	connected := redisDB.Set("Connected", true, 0)
 
@@ -29,9 +37,13 @@ func main() {
 	}
 
 	log.Println("Starting server ..")
-	app := fiber.New()
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World 👋!")
+	engine := html.New("./templates", ".html")
+	app := fiber.New(fiber.Config{
+		Views: engine,
+	})
+	// app.Static("/", "static/public")
+	app.Get("/chat", func(c *fiber.Ctx) error {
+		return c.Render("index", fiber.Map{})
 	})
 
 	app.Get("/ws/:id", accounts.Register(redisDB))
