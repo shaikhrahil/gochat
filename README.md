@@ -8,4 +8,7 @@ What does it do ?
 - Once user disconnected , all messages deleted
 - If user unavailable ,messages stored , until he / she joins chat
 
-## Demo :fire: https://chattter-box.herokuapp.com/
+### Demo :fire:
+
+- https://chattter-box.herokuapp.com/
+- Could load a little slow since a heroku dyno

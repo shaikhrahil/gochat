@@ -2,6 +2,7 @@ package main
 
 import (
 	"chatterbox/accounts"
+	"chatterbox/templates"
 	"log"
 	"os"
 
@@ -50,16 +51,9 @@ func main() {
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
-	app.Get("/ws/:id", accounts.Register(redisDB))
 	// app.Static("/", "static/public")
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{})
-	})
-	app.Get("/chat", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{})
-	})
-
-	app.Get("/ws/:id", accounts.Register(redisDB))
+	app.Get("/chat/:id", accounts.Register(redisDB))
+	app.Get("/", templates.Render("index"))
 
 	port := os.Getenv("PORT")
 

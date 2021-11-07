@@ -37,8 +37,21 @@ func Register(rdb *redis.Client) func(*fiber.Ctx) error {
 			return nil
 		})
 
-		go messaging.HandleOutbound(user.MessageChan, conn)
+		go messaging.HandleOutbound(user.MessageChan, conn, messageFactory(*user))
 		messaging.HandleInbound(conn, rdb, user.DisconnectChan)
 
 	})
+}
+
+func messageFactory(u User) func(msg string) messaging.Message {
+	return func(msg string) messaging.Message {
+		parsedMsg := messaging.Message{
+			Message: msg,
+			From: messaging.From{
+				ID:   u.Id,
+				Name: u.Name,
+			},
+		}
+		return parsedMsg
+	}
 }

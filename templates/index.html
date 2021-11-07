@@ -1,12 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+  <style>
+    #messagesSection {
+      display: flex;
+      height: 80vh;
+      border-bottom: 1px solid black;
+    }
+    #messagesSection > * {
+      width: 50%;
+      padding: 20px;
+    }
+    #messagesSection > *:first-child {
+      border-right: 1px solid black;
+    }
+    #messageCompose {
+      padding: 20px;
+    }
+    #logs,
+    #messages {
+      position: relative;
+      max-height: 100%;
+      overflow-y: auto;
+    }
+    #logs > h3,
+    #messages > h3 {
+      position: sticky;
+    }
+  </style>
   <head>
     <meta charset="UTF-8" />
     <title>Chatterbox</title>
   </head>
 
   <body>
-    <section>
+    <section id="messagesSection">
+      <div id="messages">
+        <h3>Messages :</h3>
+      </div>
+      <div id="logs">
+        <h3>Logs :</h3>
+      </div>
+    </section>
+    <section id="messageCompose">
       <form id="messageForm">
         <input
           type="text"
@@ -23,34 +58,39 @@
           name="msg"
           required
         />
+        <input id="autoScroll" type="checkbox" value="yes" />
         <input type="submit" value="Send" />
       </form>
-    </section>
 
-    <section id="messagesSection">
-      <h3>Messages :</h3>
+      <button onclick="disconnect">Disconnect</button>
     </section>
   </body>
 
   <script>
     const params = new URLSearchParams(location.href.split("?")[1]);
     const socket =
-      "wss://" +
+      "ws://" +
       document.location.host +
-      "/ws/" +
+      "/chat/" +
       (params?.get("u") || "rahil");
     const ws = new WebSocket(socket);
-    const wsDom = document.getElementById("messagesSection");
+    const messagesDom = document.querySelector("#messages");
+    const autoScroll = document.querySelector("#autoScroll");
+    const logsDom = document.querySelector("#logs");
     const createWsDomChild = (msg) => {
       const el = document.createElement("p");
       const hLine = document.createElement("hr");
-      el.innerText = msg;
-      wsDom.prepend(el);
-      wsDom.prepend(hLine);
+      el.innerText = msg.Message;
+      messagesDom.appendChild(el);
+      messagesDom.appendChild(hLine);
+      const logsEl = document.createElement("p");
+      logsEl.innerText = JSON.stringify(msg);
+      logsDom.appendChild(logsEl);
+      logsDom.appendChild(hLine);
     };
+
     const disconnect = () => {
       ws.send({
-        Command: 1,
         Channel: document.getElementById("messageRecipient").value,
         Message: "",
       });
@@ -61,33 +101,40 @@
       .getElementById("messageForm")
       .addEventListener("submit", function (evt) {
         evt.preventDefault();
-        ws.send(
-          JSON.stringify({
-            Command: 2,
-            Channel: document.getElementById("messageRecipient").value,
-            Message: document.getElementById("messageInput").value,
-          })
-        );
+        const msg = {
+          Channel: document.getElementById("messageRecipient").value,
+          Message: document.getElementById("messageInput").value,
+        };
+        ws.send(JSON.stringify(msg));
       });
+
+    const createSysMessage = (msg) => ({
+      Message: msg,
+      From: { ID: 0, Name: "Sys" },
+    });
 
     ws.onerror = (msg) => {
       console.log("Error : ", msg);
-      createWsDomChild("Connection Errored");
+      createWsDomChild(createSysMessage("Connection Error"));
     };
 
     ws.onmessage = (msg) => {
       console.log("Message : ", msg);
-      createWsDomChild("Message : " + JSON.stringify(msg.data, null, 2));
+      if (autoScroll.value === "yes") {
+        messagesDom.scrollTo(0, messagesDom.scrollHeight + 200);
+        logsDom.scrollTo(0, logsDom.scrollHeight + 200);
+      }
+      createWsDomChild(JSON.parse(msg.data));
     };
 
     ws.onopen = (msg) => {
       console.log("Opened : ", msg);
-      createWsDomChild("Connected");
+      createWsDomChild(createSysMessage("Connected"));
     };
 
     ws.onclose = (msg) => {
       console.log("Closed : ", msg);
-      createWsDomChild("Connection Closed");
+      createWsDomChild(createSysMessage("Connection Closed"));
     };
   </script>
 </html>
