@@ -90,10 +90,12 @@
     };
 
     const disconnect = () => {
-      ws.send({
-        Channel: document.getElementById("messageRecipient").value,
-        Message: "",
-      });
+      ws.send(
+        JSON.stringify({
+          Channel: document.getElementById("messageRecipient").value,
+          Message: "",
+        })
+      );
       ws.close();
     };
 
