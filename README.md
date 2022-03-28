@@ -10,5 +10,5 @@ What does it do ?
 
 ### Demo :fire:
 
-- https://chattter-box.herokuapp.com/
+- https://go-chatt.herokuapp.com/
 - Could load a little slow since a heroku dyno
