@@ -1,8 +1,8 @@
 package main
 
 import (
-	"chatterbox/accounts"
-	"chatterbox/templates"
+	"gochat/accounts"
+	"gochat/templates"
 	"log"
 	"os"
 

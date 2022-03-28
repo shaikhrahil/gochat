@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "E:\\rd\\chatterbox\\",
+            "program": "E:\\rd\\gochat\\",
             "env": {},
             "args": []
         }

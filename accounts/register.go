@@ -1,7 +1,7 @@
 package accounts
 
 import (
-	"chatterbox/messaging"
+	"gochat/messaging"
 	"strings"
 
 	"github.com/go-redis/redis"

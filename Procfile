@@ -1,1 +1,1 @@
-web: chatterbox
+web: gochat

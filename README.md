@@ -1,4 +1,4 @@
-# chatterbox
+# gochat
 
 What does it do ?
 
